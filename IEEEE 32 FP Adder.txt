@@ -1,0 +1,238 @@
+module pr_circuit_8x8(input logic[7:0] in
+							,output logic[7:0] out);
+	always_comb
+		casez(in)
+			8'b1???_????: out = 8'b1000_0000;
+			8'b01??_????: out = 8'b0100_0000;
+			8'b001?_????: out = 8'b0010_0000;
+			8'b0001_????: out = 8'b0001_0000;
+			8'b0000_1???: out = 8'b0000_1000;
+			8'b0000_01??: out = 8'b0000_0100;
+			8'b0000_001?: out = 8'b0000_0010;
+			8'b0000_0001: out = 8'b0000_0001;
+			
+			8'b0000_0000: out = 0;
+			default     : out = 8'b1111_1111;
+		endcase
+endmodule
+
+module encoder_25x5(input logic[24:0] in
+						 ,output logic[4:0] out);
+	always_comb					 
+		casez (in)		
+			25'b0__0000_0000__0000_0000__0000_0001: out = 5'd24; 
+			25'b0__0000_0000__0000_0000__0000_001?: out = 5'd23;  
+			25'b0__0000_0000__0000_0000__0000_01??: out = 5'd22; 
+			25'b0__0000_0000__0000_0000__0000_1???: out = 5'd21;  
+			25'b0__0000_0000__0000_0000__0001_????: out = 5'd20;
+			25'b0__0000_0000__0000_0000__001?_????: out = 5'd19;
+			25'b0__0000_0000__0000_0000__01??_????: out = 5'd18; 
+			25'b0__0000_0000__0000_0000__1???_????: out = 5'd17;
+		
+			25'b0__0000_0000__0000_0001__????_????: out = 5'd16;
+			25'b0__0000_0000__0000_001?__????_????: out = 5'd15;
+			25'b0__0000_0000__0000_01??__????_????: out = 5'd14;
+			25'b0__0000_0000__0000_1???__????_????: out = 5'd13;
+			25'b0__0000_0000__0001_????__????_????: out = 5'd12;		
+			25'b0__0000_0000__001?_????__????_????: out = 5'd11;
+			25'b0__0000_0000__01??_????__????_????: out = 5'd10;
+			25'b0__0000_0000__1???_????__????_????: out = 5'd9;
+			
+			25'b0__0000_0001__????_????__????_????: out = 5'd8;
+			25'b0__0000_001?__????_????__????_????: out = 5'd7;
+			25'b0__0000_01??__????_????__????_????: out = 5'd6;
+			25'b0__0000_1???__????_????__????_????: out = 5'd5;
+			25'b0__0001_????__????_????__????_????: out = 5'd4;
+			25'b0__001?_????__????_????__????_????: out = 5'd3;
+			25'b0__01??_????__????_????__????_????: out = 5'd2;
+			25'b0__1???_????__????_????__????_????: out = 5'd1;
+			
+			25'b1__????_????__????_????__????_????: out = 5'd0;
+			default										  : out = 5'd31; 
+		endcase
+endmodule
+
+module pr_circuit_25x25(input logic[24:0] in
+							 ,output logic[24:0] out);
+							 
+	logic [8:0] prc1,prc2,prc3;
+	
+	pr_circuit_8x8 _8x8pr1(in[23:16],prc1);
+	pr_circuit_8x8 _8x8pr2(in[15: 8],prc2);
+	pr_circuit_8x8 _8x8pr3(in[ 7: 0],prc3);
+	
+	assign out[24]    = in[24];
+	assign out[23:16] = prc1 & {8{~in[24]}};
+	assign out[15:8]  = prc2 & {8{~in[24]}} & {8{~|in[23:16]}};
+	assign out[7:0]   = prc3 & {8{~in[24]}} & {8{~|in[23:16]}} & {8{~|in[15:8]}};
+endmodule
+
+module expcomp(input logic[7:0] expa, expb,
+                output logic alessb,
+                output logic[7:0] exp, shift);
+   
+    logic[7:0] aminusb, bminusa;
+    assign aminusb = expa - expb;
+    assign bminusa = expb - expa;
+    assign alessb = aminusb[7];
+   
+    always_comb
+        if (alessb) begin
+            exp = expb;
+            shift = bminusa;
+        end
+        else begin
+            exp = expa;
+            shift = aminusb;
+        end
+endmodule
+
+module shiftmant(input logic alessb,
+                    input logic [23:0] manta, mantb,
+                    input logic [7:0] shift,
+                    output logic [23:0] shifted_mant);
+ 
+    logic [23:0] shifted_val;
+    assign shifted_val = alessb ? (manta >> shift): (mantb >> shift);
+ 
+    always_comb
+        if (shift[7] | shift[6] | shift[5] | (shift[4] & shift[3]))
+            shifted_mant = 24'b0;
+        else
+            shifted_mant = shifted_val;
+endmodule
+
+module normalize_sign(input logic alessb, signa, signb,
+							 input logic[23:0] manta, mantb, shifted_mant,
+							 output logic[24:0] signeda, signedb);
+							 
+	logic[24:0] manta_ive, mantb_ive, shifted_mant_ive,
+					sa,sb,s_shifted_mant;
+	logic is_conva,is_convb ,signa_eq_signb;
+					
+	assign signa_eq_signb = ~(signa^signb);
+	assign manta_ive = ~manta + 1;
+	assign mantb_ive = ~mantb + 1;
+	assign shifted_mant_ive = ~shifted_mant + 1;
+	
+	assign is_conva = ~signb & ~signa_eq_signb;
+	assign is_convb = signb & ~signa_eq_signb;
+	
+	assign sa      = (is_conva)? manta_ive : manta;
+	assign sb      = (is_convb)? mantb_ive: mantb;
+	always_comb
+		case({alessb,signa,signb})
+			0: s_shifted_mant = shifted_mant;
+			1: s_shifted_mant = shifted_mant_ive;
+			2: s_shifted_mant = shifted_mant;
+			3: s_shifted_mant = shifted_mant_ive;
+			4: s_shifted_mant = shifted_mant;
+			5: s_shifted_mant = shifted_mant;
+			6: s_shifted_mant = shifted_mant_ive;
+			7: s_shifted_mant = shifted_mant_ive;
+			default: s_shifted_mant = 0;
+		endcase
+	assign signedb = (alessb)  ? sb   : sa   ;
+	assign signeda = (signa_eq_signb) ? shifted_mant : s_shifted_mant;
+
+endmodule	
+
+module addmant(input logic signa, signb,
+                input logic[24:0] signeda, signedb,
+                input logic[7:0] exp_pre,
+                output logic[22:0] mant,
+                output logic[7:0] exp,
+					 output logic sign, flow);
+					 
+	 logic signa_eq_signb, is_signed_addval_ive, OF, preXp_less_mantXp, is_zero_mant;
+	 logic[7:0] mant_exp, exp_inc, exp_dec, non_zero_exp;
+	 logic[24:0] signed_addval, addval_ive,addresult, addresult_msone,normalized_shift_mant;
+      
+	 assign signa_eq_signb = ~(signa^signb);
+	 assign sign = (signa_eq_signb) ? signa : signed_addval[24] ;	 
+	 assign signed_addval = signeda + signedb;
+	 assign addval_ive = ~signed_addval + 1;
+	 assign is_signed_addval_ive = ~signa_eq_signb & signed_addval[24];
+	 assign addresult = (is_signed_addval_ive)? addval_ive : signed_addval;
+	 
+	 pr_circuit_25x25 prc(addresult,addresult_msone);
+	 encoder_25x5 enc(addresult_msone,mant_exp);
+	 
+	 assign preXp_less_mantXp = exp_pre < (mant_exp - 1);
+	 ///***************///
+	 assign exp_dec = exp_pre - (mant_exp - 1);
+	 ///**************///
+	 assign {OF , exp_inc } = exp_pre + 1;
+	 assign non_zero_exp = (signa_eq_signb)? exp_inc : exp_dec;
+	 assign normalized_shift_mant = addresult << mant_exp;
+	 
+	 assign is_zero_mant = ~|addresult_msone;
+	 assign flow = (signa_eq_signb) ? OF    : preXp_less_mantXp ;
+	 assign exp  = (is_zero_mant)   ? 8'd0  : non_zero_exp;
+    assign mant = (is_zero_mant)   ? 23'd0 : normalized_shift_mant[23:1];
+	
+endmodule
+
+module addmant(input logic signa, signb,
+                input logic[24:0] signeda, signedb,
+                input logic[7:0] exp_pre,
+                output logic[22:0] mant,
+                output logic[7:0] exp,
+					 output logic sign, flow);
+					 
+	 logic signa_eq_signb, is_signed_addval_ive, OF, preXp_less_mantXp, is_zero_mant;
+	 logic[7:0] mant_exp, exp_inc, exp_dec, non_zero_exp;
+	 logic[24:0] signed_addval, addval_ive,addresult, addresult_msone,normalized_shift_mant;
+      
+	 assign signa_eq_signb = ~(signa^signb);
+	 assign sign = (signa_eq_signb) ? signa : signed_addval[24] ;	 
+	 assign signed_addval = signeda + signedb;
+	 assign addval_ive = ~signed_addval + 1;
+	 assign is_signed_addval_ive = ~signa_eq_signb & signed_addval[24];
+	 assign addresult = (is_signed_addval_ive)? addval_ive : signed_addval;
+	 
+	 pr_circuit_25x25 prc(addresult,addresult_msone);
+	 encoder_25x5 enc(addresult_msone,mant_exp);
+	 
+	 assign preXp_less_mantXp = exp_pre < (mant_exp - 1);
+	 ///***************///
+	 assign exp_dec = exp_pre - (mant_exp - 1);
+	 ///**************///
+	 assign {OF , exp_inc } = exp_pre + 1;
+	 assign non_zero_exp = (signa_eq_signb)? exp_inc : exp_dec;
+	 assign normalized_shift_mant = addresult << mant_exp;
+	 
+	 assign is_zero_mant = ~|addresult_msone;
+	 assign flow = (signa_eq_signb) ? OF    : preXp_less_mantXp ;
+	 assign exp  = (is_zero_mant)   ? 8'd0  : non_zero_exp;
+    assign mant = (is_zero_mant)   ? 23'd0 : normalized_shift_mant[23:1];
+	
+endmodule
+
+module IEEE32float_adder(input logic [31:0] a,b,
+                         output logic [31:0] s);
+	logic full_expa, full_expb, zero_manta ,zero_mantb;
+	logic[31:0] addition,NAN;
+	logic[30:0] INF;
+	
+	faddition faddition1(a,b,addition);
+	assign NAN = 32'hffff_ffff;
+	assign INF = {8'hff,3'b000,20'h00000};
+	assign full_expa  = &a[30:23];
+	assign full_expb  = &b[30:23];
+	assign zero_manta = ~|a[22:0];
+	assign zero_mantb = ~|b[22:0];
+	
+	
+	always_comb
+		casez({full_expa,full_expb,zero_manta,zero_mantb})
+			4'b00??: s = addition;
+			4'b01?0: s = NAN;
+			4'b01?1: s = {b[31],INF};
+			4'b100?: s = NAN;
+			4'b101?: s = {a[31],INF};
+			4'b110?: s = NAN;
+			4'b1110: s = NAN;
+			4'b1111: s = (a[31]^b[31])? NAN : {a[31],INF};
+		endcase
+endmodule

@@ -1,0 +1,14 @@
+module shiftmant(input logic alessb,
+                    input logic [23:0] manta, mantb,
+                    input logic [7:0] shamt,
+                    output logic [23:0] shmant);
+ 
+    logic [23:0] shiftedval;
+    assign shiftedval = alessb ? (manta >> shamt): (mantb >> shamt);
+ 
+    always_comb
+        if (shamt[7] | shamt[6] | shamt[5] | (shamt[4] & shamt[3]))
+            shmant = 24'b0;
+        else
+            shmant = shiftedval;
+endmodule

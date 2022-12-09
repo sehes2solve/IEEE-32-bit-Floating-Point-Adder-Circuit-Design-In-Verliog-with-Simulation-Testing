@@ -1,0 +1,15 @@
+module addmant(input logic alessb,
+                input logic[23:0] manta, mantb, shmant
+                input logic[7:0] exp_pre,
+                output logic[22:0] fract,
+                output logic[7:0] exp);
+   
+    logic[24:0] addresult;
+    logic[23:0] addval;
+    assign addval = alessb ? mantb : manta;
+    assign addresult = shmant + addval;
+    assign fract = addresult[24]?addresult[23:1]:addresult[22:0];
+   
+    assign exp = addresult[24]?(exp_pre + 1):exp_pre;
+   
+endmodule

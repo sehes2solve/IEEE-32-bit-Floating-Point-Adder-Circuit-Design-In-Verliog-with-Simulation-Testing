@@ -1,0 +1,122 @@
+Flow report for floating
+Thu Jan 02 15:43:19 2020
+Quartus II 32-bit Version 12.0 Build 178 05/31/2012 SJ Web Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Flow Summary
+  3. Flow Settings
+  4. Flow Non-Default Global Settings
+  5. Flow Elapsed Time
+  6. Flow OS Summary
+  7. Flow Log
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 1991-2012 Altera Corporation
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, Altera MegaCore Function License 
+Agreement, or other applicable license agreement, including, 
+without limitation, that your use is for the sole purpose of 
+programming logic devices manufactured by Altera and sold by 
+Altera or its authorized distributors.  Please refer to the 
+applicable agreement for further details.
+
+
+
++-------------------------------------------------------------------------------+
+; Flow Summary                                                                  ;
++------------------------------------+------------------------------------------+
+; Flow Status                        ; Successful - Thu Jan 02 15:43:16 2020    ;
+; Quartus II 32-bit Version          ; 12.0 Build 178 05/31/2012 SJ Web Edition ;
+; Revision Name                      ; floating                                 ;
+; Top-level Entity Name              ; IEEE32float_adder                        ;
+; Family                             ; Cyclone IV GX                            ;
+; Total logic elements               ; 704 / 21,280 ( 3 % )                     ;
+;     Total combinational functions  ; 704 / 21,280 ( 3 % )                     ;
+;     Dedicated logic registers      ; 0 / 21,280 ( 0 % )                       ;
+; Total registers                    ; 0                                        ;
+; Total pins                         ; 96 / 167 ( 57 % )                        ;
+; Total virtual pins                 ; 0                                        ;
+; Total memory bits                  ; 0 / 774,144 ( 0 % )                      ;
+; Embedded Multiplier 9-bit elements ; 0 / 80 ( 0 % )                           ;
+; Total GXB Receiver Channel PCS     ; 0 / 4 ( 0 % )                            ;
+; Total GXB Receiver Channel PMA     ; 0 / 4 ( 0 % )                            ;
+; Total GXB Transmitter Channel PCS  ; 0 / 4 ( 0 % )                            ;
+; Total GXB Transmitter Channel PMA  ; 0 / 4 ( 0 % )                            ;
+; Total PLLs                         ; 0 / 4 ( 0 % )                            ;
+; Device                             ; EP4CGX22CF19C6                           ;
+; Timing Models                      ; Final                                    ;
++------------------------------------+------------------------------------------+
+
+
++-----------------------------------------+
+; Flow Settings                           ;
++-------------------+---------------------+
+; Option            ; Setting             ;
++-------------------+---------------------+
+; Start date & time ; 01/02/2020 15:42:35 ;
+; Main task         ; Compilation         ;
+; Revision Name     ; floating            ;
++-------------------+---------------------+
+
+
++----------------------------------------------------------------------------------------------------------------------+
+; Flow Non-Default Global Settings                                                                                     ;
++-------------------------------------+-------------------------------+---------------+-------------------+------------+
+; Assignment Name                     ; Value                         ; Default Value ; Entity Name       ; Section Id ;
++-------------------------------------+-------------------------------+---------------+-------------------+------------+
+; COMPILER_SIGNATURE_ID               ; 1095258603486.157797255506828 ; --            ; --                ; --         ;
+; PARTITION_COLOR                     ; 16764057                      ; --            ; IEEE32float_adder ; Top        ;
+; PARTITION_FITTER_PRESERVATION_LEVEL ; PLACEMENT_AND_ROUTING         ; --            ; IEEE32float_adder ; Top        ;
+; PARTITION_NETLIST_TYPE              ; SOURCE                        ; --            ; IEEE32float_adder ; Top        ;
+; TOP_LEVEL_ENTITY                    ; IEEE32float_adder             ; floating      ; --                ; --         ;
++-------------------------------------+-------------------------------+---------------+-------------------+------------+
+
+
++-------------------------------------------------------------------------------------------------------------------------------+
+; Flow Elapsed Time                                                                                                             ;
++---------------------------+--------------+-------------------------+---------------------+------------------------------------+
+; Module Name               ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
++---------------------------+--------------+-------------------------+---------------------+------------------------------------+
+; Analysis & Synthesis      ; 00:00:10     ; 1.0                     ; 336 MB              ; 00:00:08                           ;
+; Fitter                    ; 00:00:22     ; 1.0                     ; 482 MB              ; 00:00:21                           ;
+; Assembler                 ; 00:00:05     ; 1.0                     ; 332 MB              ; 00:00:05                           ;
+; TimeQuest Timing Analyzer ; 00:00:08     ; 1.0                     ; 365 MB              ; 00:00:08                           ;
+; Total                     ; 00:00:45     ; --                      ; --                  ; 00:00:42                           ;
++---------------------------+--------------+-------------------------+---------------------+------------------------------------+
+
+
++----------------------------------------------------------------------------------------+
+; Flow OS Summary                                                                        ;
++---------------------------+------------------+-----------+------------+----------------+
+; Module Name               ; Machine Hostname ; OS Name   ; OS Version ; Processor type ;
++---------------------------+------------------+-----------+------------+----------------+
+; Analysis & Synthesis      ; pc-PC            ; Windows 7 ; 6.1        ; x86_64         ;
+; Fitter                    ; pc-PC            ; Windows 7 ; 6.1        ; x86_64         ;
+; Assembler                 ; pc-PC            ; Windows 7 ; 6.1        ; x86_64         ;
+; TimeQuest Timing Analyzer ; pc-PC            ; Windows 7 ; 6.1        ; x86_64         ;
++---------------------------+------------------+-----------+------------+----------------+
+
+
+------------
+; Flow Log ;
+------------
+quartus_map --read_settings_files=on --write_settings_files=off floating -c floating
+quartus_fit --read_settings_files=off --write_settings_files=off floating -c floating
+quartus_asm --read_settings_files=off --write_settings_files=off floating -c floating
+quartus_sta floating -c floating
+
+
+

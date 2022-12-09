@@ -1,0 +1,12 @@
+/*module pr_cicuit_25x25(input logic[24:0] in
+							 ,output logic[24:0] out)
+	logic[7:0] prc1,prc2,prc2;
+	
+	assign out[24] = in[24];
+	pr
+endmodule*/
+module pr_cicuit_25x25(input logic[2:0] in
+							 ,input logic _bit
+							 ,output logic[2:0] out)
+	assign out = in & _bit;
+endmodule

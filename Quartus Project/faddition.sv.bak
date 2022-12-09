@@ -1,0 +1,16 @@
+module faddition(input logic [31:0] a,b,
+                output logic [31:0] s);
+               
+    logic [7:0] expa, expb , exp_pre,exp,shamt;
+    logic alessb;
+    logic [23:0] manta,mantb,shmant;
+    logic [22:0] fract;
+   
+    assign {expa,manta} = {a[30:23],1'b1,a[22:0]};
+    assign {expb,mantb} = {b[30:23],1'b1,b[22:0]};
+    assign s = {1'b0,exp,fract};
+ 
+    expcomp expcomp1(expa, expb, alessb, exp_pre, shamt);
+    shiftmant shiftmant1(alessb, manta, mantb, shamt, shmant);
+    addmant addmant1(alessb, manta, mantb, shmant, exp_pre , fract, exp);
+endmodule
